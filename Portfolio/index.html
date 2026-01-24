@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Portfolio Website</title>
+</head>
+<body>
+    <header>   
+        <a href="#" class="logo">Ramaakshay Mallireddy</a>
+
+        <nav>
+            <a href="#home" class="active">Home</a>
+            <a href="#CAD">CAD</a>
+            <a href="#Classes">Classes</a>
+            <a href="#Resume">Resume</a>
+            <a href="#Contact">Contact</a>
+        </nav>
+
+    </header>
+    <section class="home" id="home">
+        <div class="home-img">
+            <img src="main.jpeg" alt="">
+        </div>
+        <div class="home-content">
+            <!-- <h1>Hi, It's <span>Akshay</span></h1> -->
+            <h3 class="typing-text">Aerospace Engineering @ UT Austin</h3>
+            <p>This portfolio mainly servies as a page to house all my completed projects. These projects span from CAD files to programs.</p>
+            <div class="social-icons">
+                <a href="https://www.linkedin.com/in/ramaakshay-mallireddy" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://github.com/riminator" target="_blank"><i class="fa-brands fa-github"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="CAD" id="CAD">
+        <div class="CAD-content">
+            <h1>All Completed CAD Projects</h1>
+            <div class="CAD-projects">
+                <div class="project-card">
+                    <img src="project1.png" alt="Satellite Design">
+                    <h4>Satellite Design</h4>
+                    <p>A 3D model of a CubeSat with deployable solar panels.</p>
+                </div>
+                <div class="project-card">
+                    <img src="project2.png" alt="Rocket Engine">
+                    <h4>Rocket Engine</h4>
+                    <p>CAD model of a liquid-fueled rocket engine assembly.</p>
+                </div>
+                <div class="project-card">
+                    <img src="project3.png" alt="Aircraft Redesign">
+                    <h4>Aircraft Redesign</h4>
+                    <p>Redesigned F18 variant with improved aerodynamics.</p>
+                </div>
+                <!-- Add more project cards as needed -->
+            </div>
+        </div>
+    </section>
+
+    <section class="Classes" id="Classes">
+        <div class="Classes-content">
+            <h1>All Completed & Current Classes</h1>
+                <h2>Completed Classes: </h2>
+                    <ul>
+                        <li>Multivariable Calculus (M408D)</li>
+                        <li>AI Design and Development (ITD111)</li>
+                        <li>Computer Programming using Python (CS303E)</li>
+                        <li>C++ Data Structures & Algorithms (COE301)</li>
+                    </ul>
+
+                <h2>Current Classes: </h2>
+                    <ul>
+                        <li>Differential Equations & Linear Algebra (M427J)</li>
+                        <li>Statics (E M 303)</li>
+                        <li>Thermodynamics (ME 310T)</li>
+                        <li>Robot Learning (CS 309)</li>
+                        <li>Engineering Computation (COE 311K)</li>
+                    </ul>
+        </div>
+    </section>
+
+    <section class="Resume" id="Resume">
+        <div class="Resume-content">
+            <h1>My Resume</h1>
+            <p>You can view or download my resume below:</p>
+
+            <!-- Embedded PDF preview -->
+            <embed src="Ramaakshay_Mallireddy_Resume.pdf" type="application/pdf" width="100%" height="600px" />
+
+            <!-- Download button -->
+            <a href="Ramaakshay_Mallireddy_Resume.pdf" target="_blank" class="btn">Download Resume</a>
+        </div>
+    </section>
+
+    <section class="Contact" id="Contact">
+        <div class="Contact-content">
+            <h1>Contact Me</h1>
+            <p>If you’d like to get in touch, feel free to reach out via email or connect with me on LinkedIn/GitHub:</p>
+            
+            <p>
+                <a href="mailto:akshaymall@utexas.edu" class="btn">Email Me</a>
+            </p>
+
+            <div class="social-icons">
+                <a href="https://www.linkedin.com/in/ramaakshay-mallireddy" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://github.com/riminator" target="_blank"><i class="fa-brands fa-github"></i></a>
+            </div>
+        </div>
+    </section>
+
+
+</body>
+<script>
+const sections = document.querySelectorAll("section");
+const navLinks = document.querySelectorAll("nav a");
+
+window.addEventListener("scroll", () => {
+    let currentSection = "";
+
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+
+        if (pageYOffset >= sectionTop - sectionHeight / 3) {
+            currentSection = section.getAttribute("id");
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove("active");
+        if (link.getAttribute("href") === `#${currentSection}`) {
+            link.classList.add("active");
+        }
+    });
+});
+</script>
+
+</html>
