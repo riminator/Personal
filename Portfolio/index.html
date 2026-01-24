@@ -13,6 +13,11 @@
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
     <title>Ramaakshay Mallireddy - Portfolio</title>
 </head>
 <body>
@@ -122,59 +127,55 @@
     </div>
 </section>
 
-<!-- SCRIPT -->
 <script>
-const sections = document.querySelectorAll("section");
-const navLinks = document.querySelectorAll("nav a");
+    const sections = document.querySelectorAll("section");
+    const navLinks = document.querySelectorAll("nav a");
 
-window.addEventListener("scroll", () => {
-    let currentSection = "";
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop - 100; // offset for header
-        if (pageYOffset >= sectionTop) {
-            currentSection = section.getAttribute("id");
-        }
-    });
+    window.addEventListener("scroll", () => {
+        let currentSection = "";
 
-    navLinks.forEach(link => {
-        link.classList.remove("active");
-        if (link.getAttribute("href") === `#${currentSection}`) {
-            link.classList.add("active");
-        }
+        sections.forEach(section => {
+            const sectionTop = section.getBoundingClientRect().top;
+            if (sectionTop <= 150) { // threshold from top
+                currentSection = section.getAttribute("id");
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove("active");
+            if (link.getAttribute("href") === `#${currentSection}`) {
+                link.classList.add("active");
+            }
+        });
     });
-});
 </script>
 
 <script>
-function openImage(src) {
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = 0;
-    overlay.style.left = 0;
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
-    overlay.style.display = 'flex';
-    overlay.style.justifyContent = 'center';
-    overlay.style.alignItems = 'center';
-    overlay.style.zIndex = 1000;
+    function openImage(src) {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = 0;
+        overlay.style.left = 0;
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.zIndex = 1000;
 
-    // Create image
-    const img = document.createElement('img');
-    img.src = src;
-    img.style.maxWidth = '90%';
-    img.style.maxHeight = '90%';
-    img.style.borderRadius = '1rem';
-    img.style.boxShadow = '0 6px 20px rgba(0,0,0,0.5)';
-    overlay.appendChild(img);
+        const img = document.createElement('img');
+        img.src = src;
+        img.style.maxWidth = '90%';
+        img.style.maxHeight = '90%';
+        img.style.borderRadius = '1rem';
+        img.style.boxShadow = '0 6px 20px rgba(0,0,0,0.5)';
+        overlay.appendChild(img);
 
-    // Close overlay on click
-    overlay.addEventListener('click', () => document.body.removeChild(overlay));
+        overlay.addEventListener('click', () => document.body.removeChild(overlay));
 
-    // Add to body
-    document.body.appendChild(overlay);
-}
+        document.body.appendChild(overlay);
+    }
 </script>
 
 
