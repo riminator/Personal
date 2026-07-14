@@ -31,7 +31,6 @@
         <a href="#CAD">CAD</a>
         <a href="#Classes">Classes</a>
         <a href="#Resume">Resume</a>
-        <a href="#twin">AI Twin</a>
         <a href="#Contact">Contact</a>
     </nav>
 </header>
@@ -623,50 +622,6 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- BAND 5.5 — DIGITAL TWIN                                                -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<div class="section-band">
-<section class="twin" id="twin">
-
-    <div class="section-heading">
-        <div class="icon-wrap" style="background:rgba(236,173,10,0.12); color:#ecad0a;">
-            <i class="fas fa-robot"></i>
-        </div>
-        <h1>AI Digital Twin</h1>
-        <div class="line"></div>
-    </div>
-
-    <div class="twin-intro">
-        <p>
-            Ask my AI twin anything about my background, skills, or experience — it's trained on my
-            career history and can answer questions like a real conversation. Powered by GPT and
-            connected to my profile data.
-        </p>
-        <a href="https://your-agent-url.fly.dev" target="_blank" class="btn-twin-open" id="twin-open-btn">
-            <i class="fas fa-arrow-up-right-from-square fa-sm"></i> Open Full Chat
-        </a>
-    </div>
-
-    <div class="twin-embed-wrapper">
-        <div class="twin-embed-bar">
-            <span class="twin-embed-dot" style="background:#f87171;"></span>
-            <span class="twin-embed-dot" style="background:#fbbf24;"></span>
-            <span class="twin-embed-dot" style="background:#34d399;"></span>
-            <span class="twin-embed-label">Digital Twin — AI Chat</span>
-        </div>
-        <iframe
-            id="twin-iframe"
-            src="https://your-agent-url.fly.dev"
-            title="AI Digital Twin"
-            loading="lazy"
-            allow="microphone"
-        ></iframe>
-    </div>
-
-</section>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
 <!-- BAND 6 — CONTACT                                                       -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 <div class="section-band">
@@ -706,25 +661,146 @@
     <p>© 2025 Ramaakshay Mallireddy · Aerospace Engineering @ UT Austin</p>
 </footer>
 
+<!-- ─── FLOATING AI TWIN CHAT BUBBLE ────────────────────────────────────── -->
+<div id="twin-bubble">
+    <!-- Toggle button -->
+    <button id="twin-toggle" aria-label="Chat with AI twin" title="Chat with my AI twin">
+        <i class="fas fa-robot" id="twin-icon-open"></i>
+        <i class="fas fa-xmark" id="twin-icon-close" style="display:none;"></i>
+    </button>
+
+    <!-- Chat panel -->
+    <div id="twin-panel" aria-live="polite">
+        <div id="twin-header">
+            <div id="twin-header-left">
+                <span id="twin-avatar"><i class="fas fa-robot"></i></span>
+                <div>
+                    <div id="twin-name">Akshay's AI Twin</div>
+                    <div id="twin-status"><span id="twin-dot"></span>Online</div>
+                </div>
+            </div>
+            <button id="twin-close-btn" aria-label="Close chat">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+
+        <div id="twin-messages">
+            <div class="twin-msg bot">
+                <span class="twin-msg-text">Hi! I'm Akshay's AI twin. Ask me anything about his background, skills, or projects.</span>
+            </div>
+        </div>
+
+        <div id="twin-input-row">
+            <input id="twin-input" type="text" placeholder="Ask me anything…" autocomplete="off" />
+            <button id="twin-send" aria-label="Send">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
+    // ── Nav active state ────────────────────────────────────────────────────
     const sections = document.querySelectorAll("section");
     const navLinks = document.querySelectorAll("nav a");
-
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const id = entry.target.getAttribute("id");
                 navLinks.forEach(link => {
                     link.classList.remove("active");
-                    if (link.getAttribute("href") === `#${id}`) {
-                        link.classList.add("active");
-                    }
+                    if (link.getAttribute("href") === `#${id}`) link.classList.add("active");
                 });
             }
         });
     }, { rootMargin: "-40% 0px -55% 0px" });
+    sections.forEach(s => observer.observe(s));
 
-    sections.forEach(section => observer.observe(section));
+    // ── Digital Twin chat bubble ────────────────────────────────────────────
+    const AGENT_URL = "https://your-render-url.onrender.com";
+
+    const panel      = document.getElementById("twin-panel");
+    const toggleBtn  = document.getElementById("twin-toggle");
+    const closeBtn   = document.getElementById("twin-close-btn");
+    const iconOpen   = document.getElementById("twin-icon-open");
+    const iconClose  = document.getElementById("twin-icon-close");
+    const messages   = document.getElementById("twin-messages");
+    const input      = document.getElementById("twin-input");
+    const sendBtn    = document.getElementById("twin-send");
+
+    let history = [];   // [{role, content}, ...]
+    let isOpen  = false;
+
+    function togglePanel() {
+        isOpen = !isOpen;
+        panel.classList.toggle("open", isOpen);
+        iconOpen.style.display  = isOpen ? "none"         : "inline-block";
+        iconClose.style.display = isOpen ? "inline-block" : "none";
+        if (isOpen) setTimeout(() => input.focus(), 200);
+    }
+
+    toggleBtn.addEventListener("click", togglePanel);
+    closeBtn.addEventListener("click",  togglePanel);
+
+    function appendMsg(role, text) {
+        const div = document.createElement("div");
+        div.className = `twin-msg ${role}`;
+        const span = document.createElement("span");
+        span.className = "twin-msg-text";
+        span.textContent = text;
+        div.appendChild(span);
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    function setTyping(show) {
+        let el = document.getElementById("twin-typing");
+        if (show && !el) {
+            el = document.createElement("div");
+            el.id = "twin-typing";
+            el.className = "twin-msg bot";
+            el.innerHTML = '<span class="twin-msg-text"><span class="twin-dots"><span></span><span></span><span></span></span></span>';
+            messages.appendChild(el);
+            messages.scrollTop = messages.scrollHeight;
+        } else if (!show && el) {
+            el.remove();
+        }
+    }
+
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = "";
+        input.disabled = true;
+        sendBtn.disabled = true;
+
+        appendMsg("user", text);
+        setTyping(true);
+
+        try {
+            const res = await fetch(`${AGENT_URL}/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: text, history })
+            });
+            const data = await res.json();
+            const reply = data.reply || "Sorry, I couldn't get a response.";
+            setTyping(false);
+            appendMsg("bot", reply);
+            history.push({ role: "user", content: text });
+            history.push({ role: "assistant", content: reply });
+        } catch {
+            setTyping(false);
+            appendMsg("bot", "Connection error — please try again.");
+        }
+
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
 </script>
 
 </body>

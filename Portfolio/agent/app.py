@@ -1,45 +1,73 @@
+"""
+Digital Twin — FastAPI backend
+POST /chat  { "message": "...", "history": [...] }  →  { "reply": "..." }
+GET  /health  →  200 OK
+"""
+import json
+import os
+
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from openai import OpenAI
+
 from context import TWIN_SYSTEM_PROMPT
 from tools import tools, handle_tool_calls
-from styles import CSS, JS, EXAMPLES
-from dotenv import load_dotenv
-import gradio as gr
-import os
 
 load_dotenv(override=True)
 
-MODEL_NAME = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-openai = OpenAI()
+app = FastAPI(title="Digital Twin API")
 
-system = [{"role": "system", "content": TWIN_SYSTEM_PROMPT}]
+# Allow the portfolio (any origin) to call this API.
+# Tighten origins to your Netlify URL in production if desired.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["POST", "GET"],
+    allow_headers=["*"],
+)
+
+client = OpenAI()
+system_msg = {"role": "system", "content": TWIN_SYSTEM_PROMPT}
 
 
-def chat(message, history):
-    messages = system + history + [{"role": "user", "content": message}]
-    response = openai.chat.completions.create(model=MODEL_NAME, messages=messages, tools=tools)
+class ChatRequest(BaseModel):
+    message: str
+    # Each item: {"role": "user"|"assistant", "content": "..."}
+    history: list[dict] = []
+
+
+class ChatResponse(BaseModel):
+    reply: str
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
+@app.post("/chat", response_model=ChatResponse)
+def chat(req: ChatRequest):
+    messages = [system_msg] + req.history + [{"role": "user", "content": req.message}]
+    response = client.chat.completions.create(
+        model=MODEL, messages=messages, tools=tools
+    )
+    # Handle tool calls in a loop
     while response.choices[0].finish_reason == "tool_calls":
-        message = response.choices[0].message
-        tool_calls = message.tool_calls
-        results = handle_tool_calls(tool_calls)
-        messages.append(message)
-        messages.extend(results)
-        response = openai.chat.completions.create(model=MODEL_NAME, messages=messages, tools=tools)
-    return response.choices[0].message.content
+        msg = response.choices[0].message
+        tool_results = handle_tool_calls(msg.tool_calls)
+        messages.append(msg)
+        messages.extend(tool_results)
+        response = client.chat.completions.create(
+            model=MODEL, messages=messages, tools=tools
+        )
+    return ChatResponse(reply=response.choices[0].message.content)
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 7860))
-    gr.ChatInterface(
-        chat,
-        examples=EXAMPLES,
-        title="Digital Twin",
-        description="Talk to my AI twin about my career",
-        chatbot=gr.Chatbot(show_label=False),
-    ).launch(
-        css=CSS,
-        js=JS,
-        theme=gr.themes.Base(),
-        server_name="0.0.0.0",
-        server_port=port,
-    )
+    import uvicorn
+    port = int(os.getenv("PORT", 10000))
+    uvicorn.run("app:app", host="0.0.0.0", port=port)
