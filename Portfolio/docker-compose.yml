@@ -1,0 +1,28 @@
+# docker-compose.yml — run the full portfolio stack locally
+#
+# Usage:
+#   cp agent/.env.example agent/.env   # fill in secrets
+#   docker compose up --build
+#
+# Static site → http://localhost:8080
+# Digital Twin → http://localhost:7860
+
+version: "3.9"
+
+services:
+  portfolio:
+    build:
+      context: ./static
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  agent:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
+    ports:
+      - "7860:7860"
+    env_file: ./agent/.env
+    restart: unless-stopped

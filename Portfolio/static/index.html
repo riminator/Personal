@@ -13,9 +13,9 @@
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
     <link rel="manifest" href="site.webmanifest">
 
     <title>Ramaakshay Mallireddy — Portfolio</title>
@@ -41,7 +41,7 @@
 <div class="section-band">
 <section class="home" id="home">
     <div class="home-img">
-        <img src="main.jpeg" alt="Akshay Mallireddy">
+        <img src="assets/main.jpeg" alt="Akshay Mallireddy">
     </div>
     <div class="home-content">
         <div class="eyebrow">
@@ -405,7 +405,7 @@
         </div>
 
         <div class="project-media">
-            <img src="project_1.jpg" alt="Headphone Stand CAD">
+            <img src="assets/project_1.jpg" alt="Headphone Stand CAD">
         </div>
     </div>
 
@@ -448,7 +448,7 @@
         </div>
 
         <div class="project-media">
-            <img src="project_2.jpg" alt="F-18 Remastered">
+            <img src="assets/project_2.jpg" alt="F-18 Remastered">
         </div>
     </div>
 
@@ -491,7 +491,7 @@
         </div>
 
         <div class="project-media">
-            <img src="project_3.jpg" alt="CubeSat CAD">
+            <img src="assets/project_3.jpg" alt="CubeSat CAD">
         </div>
     </div>
 
@@ -536,15 +536,15 @@
         </div>
 
         <div class="project-media">
-            <img src="project_4.jpg" alt="Autonomous Navy Fighter Jet">
+            <img src="assets/project_4.jpg" alt="Autonomous Navy Fighter Jet">
         </div>
     </div>
 
     <div class="report-section">
         <h4><i class="fas fa-file-pdf"></i> AIAA Competition Report</h4>
         <p>Full design report submitted for the AIAA Aircraft Design Competition — University of Texas at Austin, 2026.</p>
-        <embed src="2026_The University of Texas at Austin_DESIGN_REPORT.pdf" type="application/pdf" width="100%" height="420px" />
-        <a href="2026_The University of Texas at Austin_DESIGN_REPORT.pdf" target="_blank" class="btn">
+        <embed src="assets/2026_The University of Texas at Austin_DESIGN_REPORT.pdf" type="application/pdf" width="100%" height="420px" />
+        <a href="assets/2026_The University of Texas at Austin_DESIGN_REPORT.pdf" target="_blank" class="btn">
             <i class="fas fa-arrow-up-right-from-square fa-sm"></i> View Full Report
         </a>
     </div>
@@ -612,8 +612,8 @@
 
     <div class="resume-wrapper">
         <p>Aerospace Engineering student with experience in ML, embedded systems, cloud infrastructure, and spacecraft design.</p>
-        <embed src="Ramaakshay_Mallireddy_Resume (5).pdf" type="application/pdf" width="100%" height="640px" />
-        <a href="Ramaakshay_Mallireddy_Resume (5).pdf" target="_blank" class="btn">
+        <embed src="assets/Ramaakshay_Mallireddy_Resume (5).pdf" type="application/pdf" width="100%" height="640px" />
+        <a href="assets/Ramaakshay_Mallireddy_Resume (5).pdf" target="_blank" class="btn">
             <i class="fas fa-download fa-sm"></i> Download Resume
         </a>
     </div>
@@ -661,25 +661,172 @@
     <p>© 2025 Ramaakshay Mallireddy · Aerospace Engineering @ UT Austin</p>
 </footer>
 
+<!-- ─── FLOATING AI TWIN CHAT BUBBLE ────────────────────────────────────── -->
+<div id="twin-bubble">
+    <!-- Toggle button -->
+    <button id="twin-toggle" aria-label="Chat with AI twin" title="Chat with my AI twin">
+        <i class="fas fa-robot" id="twin-icon-open"></i>
+        <i class="fas fa-xmark" id="twin-icon-close" style="display:none;"></i>
+    </button>
+
+    <!-- Chat panel -->
+    <div id="twin-panel" aria-live="polite">
+        <div id="twin-header">
+            <div id="twin-header-left">
+                <span id="twin-avatar"><i class="fas fa-robot"></i></span>
+                <div>
+                    <div id="twin-name">Akshay's AI Twin</div>
+                    <div id="twin-status"><span id="twin-dot"></span>Online</div>
+                </div>
+            </div>
+            <button id="twin-close-btn" aria-label="Close chat">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+
+        <div id="twin-messages">
+            <div class="twin-msg bot">
+                <span class="twin-msg-text">Hi! I'm Akshay's AI twin. Ask me anything about his background, skills, or projects.</span>
+            </div>
+        </div>
+
+        <div id="twin-input-row">
+            <input id="twin-input" type="text" placeholder="Ask me anything…" autocomplete="off" />
+            <button id="twin-send" aria-label="Send">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
+    // ── Nav active state ────────────────────────────────────────────────────
     const sections = document.querySelectorAll("section");
     const navLinks = document.querySelectorAll("nav a");
-
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const id = entry.target.getAttribute("id");
                 navLinks.forEach(link => {
                     link.classList.remove("active");
-                    if (link.getAttribute("href") === `#${id}`) {
-                        link.classList.add("active");
-                    }
+                    if (link.getAttribute("href") === `#${id}`) link.classList.add("active");
                 });
             }
         });
     }, { rootMargin: "-40% 0px -55% 0px" });
+    sections.forEach(s => observer.observe(s));
 
-    sections.forEach(section => observer.observe(section));
+    // ── Digital Twin chat bubble ────────────────────────────────────────────
+    const AGENT_URL = "https://portfolio-ylw8.onrender.com";
+
+    const panel      = document.getElementById("twin-panel");
+    const toggleBtn  = document.getElementById("twin-toggle");
+    const closeBtn   = document.getElementById("twin-close-btn");
+    const iconOpen   = document.getElementById("twin-icon-open");
+    const iconClose  = document.getElementById("twin-icon-close");
+    const messages   = document.getElementById("twin-messages");
+    const input      = document.getElementById("twin-input");
+    const sendBtn    = document.getElementById("twin-send");
+
+    let history = [];   // [{role, content}, ...]
+    let isOpen  = false;
+
+    function togglePanel() {
+        isOpen = !isOpen;
+        panel.classList.toggle("open", isOpen);
+        iconOpen.style.display  = isOpen ? "none"         : "inline-block";
+        iconClose.style.display = isOpen ? "inline-block" : "none";
+        if (isOpen) setTimeout(() => input.focus(), 200);
+    }
+
+    toggleBtn.addEventListener("click", togglePanel);
+    closeBtn.addEventListener("click",  togglePanel);
+
+    function appendMsg(role, text) {
+        const div = document.createElement("div");
+        div.className = `twin-msg ${role}`;
+        const span = document.createElement("span");
+        span.className = "twin-msg-text";
+        span.textContent = text;
+        div.appendChild(span);
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    function setTyping(show) {
+        let el = document.getElementById("twin-typing");
+        if (show && !el) {
+            el = document.createElement("div");
+            el.id = "twin-typing";
+            el.className = "twin-msg bot";
+            el.innerHTML = '<span class="twin-msg-text"><span class="twin-dots"><span></span><span></span><span></span></span></span>';
+            messages.appendChild(el);
+            messages.scrollTop = messages.scrollHeight;
+        } else if (!show && el) {
+            el.remove();
+        }
+    }
+
+    // Fetch with a 60s timeout — Render free tier can take ~30s to wake up
+    async function fetchWithTimeout(url, opts, ms = 60000) {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), ms);
+        try {
+            return await fetch(url, { ...opts, signal: ctrl.signal });
+        } finally {
+            clearTimeout(tid);
+        }
+    }
+
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = "";
+        input.disabled = true;
+        sendBtn.disabled = true;
+
+        appendMsg("user", text);
+        setTyping(true);
+
+        // If this is the very first message, warn that the server may be waking up
+        if (history.length === 0) {
+            const wake = document.createElement("div");
+            wake.id = "twin-wake";
+            wake.className = "twin-msg bot";
+            wake.innerHTML = '<span class="twin-msg-text" style="opacity:0.55;font-style:italic;">Server may be waking up — this first response can take up to 30s…</span>';
+            messages.appendChild(wake);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        try {
+            const res = await fetchWithTimeout(`${AGENT_URL}/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: text, history })
+            });
+            document.getElementById("twin-wake")?.remove();
+            const data = await res.json();
+            const reply = data.reply || "Sorry, I couldn't get a response.";
+            setTyping(false);
+            appendMsg("bot", reply);
+            history.push({ role: "user", content: text });
+            history.push({ role: "assistant", content: reply });
+        } catch (err) {
+            document.getElementById("twin-wake")?.remove();
+            setTyping(false);
+            const msg = err.name === "AbortError"
+                ? "The server took too long to respond. It may still be waking up — try again in a moment."
+                : "Connection error — please try again.";
+            appendMsg("bot", msg);
+        }
+
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
 </script>
 
 </body>

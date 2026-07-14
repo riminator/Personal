@@ -1,0 +1,29 @@
+# fly.toml — Digital Twin agent deployment on Fly.io
+# Deploy: fly launch (first time)  |  fly deploy (updates)
+# Docs:   https://fly.io/docs/reference/configuration/
+
+app = "akshay-digital-twin"   # change to your desired app name
+primary_region = "dfw"        # Dallas — closest to Austin TX
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "7860"
+
+[http_service]
+  internal_port = 7860
+  force_https   = true
+  auto_stop_machines  = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type       = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
