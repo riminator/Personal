@@ -44,6 +44,7 @@ class ChatResponse(BaseModel):
     reply: str
 
 
+@app.get("/")
 @app.get("/health")
 def health():
     return {"status": "ok"}

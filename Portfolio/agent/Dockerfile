@@ -12,4 +12,4 @@ EXPOSE 10000
 RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-CMD ["python", "app.py"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "10000"]
