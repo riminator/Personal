@@ -767,6 +767,17 @@
         }
     }
 
+    // Fetch with a 60s timeout — Render free tier can take ~30s to wake up
+    async function fetchWithTimeout(url, opts, ms = 60000) {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), ms);
+        try {
+            return await fetch(url, { ...opts, signal: ctrl.signal });
+        } finally {
+            clearTimeout(tid);
+        }
+    }
+
     async function sendMessage() {
         const text = input.value.trim();
         if (!text) return;
@@ -777,21 +788,36 @@
         appendMsg("user", text);
         setTyping(true);
 
+        // If this is the very first message, warn that the server may be waking up
+        if (history.length === 0) {
+            const wake = document.createElement("div");
+            wake.id = "twin-wake";
+            wake.className = "twin-msg bot";
+            wake.innerHTML = '<span class="twin-msg-text" style="opacity:0.55;font-style:italic;">Server may be waking up — this first response can take up to 30s…</span>';
+            messages.appendChild(wake);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
         try {
-            const res = await fetch(`${AGENT_URL}/chat`, {
+            const res = await fetchWithTimeout(`${AGENT_URL}/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: text, history })
             });
+            document.getElementById("twin-wake")?.remove();
             const data = await res.json();
             const reply = data.reply || "Sorry, I couldn't get a response.";
             setTyping(false);
             appendMsg("bot", reply);
             history.push({ role: "user", content: text });
             history.push({ role: "assistant", content: reply });
-        } catch {
+        } catch (err) {
+            document.getElementById("twin-wake")?.remove();
             setTyping(false);
-            appendMsg("bot", "Connection error — please try again.");
+            const msg = err.name === "AbortError"
+                ? "The server took too long to respond. It may still be waking up — try again in a moment."
+                : "Connection error — please try again.";
+            appendMsg("bot", msg);
         }
 
         input.disabled = false;
