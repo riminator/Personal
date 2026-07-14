@@ -1,0 +1,7 @@
+requests
+gradio>=4.0
+pypdf
+openai>=1.0
+python-dotenv
+# Uncomment when Supabase integration is enabled:
+# supabase>=2.0

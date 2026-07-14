@@ -1,0 +1,4 @@
+[build]
+  base    = "."
+  publish = "static"
+  # No build command — plain HTML/CSS site
