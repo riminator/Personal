@@ -2,7 +2,7 @@
 
 Personal portfolio site for Ramaakshay (Akshay) Mallireddy, Aerospace Engineering student at UT Austin. Built as a static single-page site showcasing coding projects, CAD work, coursework, and a downloadable resume.
 
-**Live site:** [riminator.github.io/Personal/Portfolio](https://riminator.github.io/Personal/Portfolio)
+**Live site:** [ramaakshaymallireddyportfolio.netlify.app](https://ramaakshaymallireddyportfolio.netlify.app)
 
 ---
 
