@@ -27,7 +27,8 @@ from_email   = os.getenv("FROM_EMAIL",  "twin@portfolio.dev")
 to_email     = os.getenv("TO_EMAIL",    "akshaymall@utexas.edu")
 
 supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_KEY")
+# Accept either key name — SUPABASE_SECRET_KEY (Supabase dashboard default) or SUPABASE_KEY
+supabase_key = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_KEY")
 
 github_user  = os.getenv("GITHUB_USER", "riminator")
 calendly_url = os.getenv("CALENDLY_URL", "")
