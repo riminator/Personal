@@ -378,15 +378,15 @@ section {
     font-weight: 600;
     padding: 0.7rem 1.6rem;
     border-radius: var(--radius-md);
-    background: var(--gold);
+    background: var(--blue);
     color: #fff;
     transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
 }
 
 .btn-primary:hover {
-    background: #e6c35c;
+    background: var(--text);
     transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(212,175,55,0.3);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-ghost {
@@ -971,7 +971,7 @@ footer {
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    background: var(--gold);
+    background: var(--blue);
     border: none;
     color: #fff;
     font-size: 1.25rem;
@@ -979,11 +979,11 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 20px rgba(212,175,55,0.45);
+    box-shadow: 0 4px 20px var(--blue-glow);
     transition: background var(--transition), transform var(--transition);
     flex-shrink: 0;
 }
-#twin-toggle:hover { background: #e6c35c; transform: scale(1.07); }
+#twin-toggle:hover { background: var(--text); transform: scale(1.07); }
 
 /* ── Chat panel ────────────────────────────────────────────────────────── */
 #twin-panel {
@@ -1171,7 +1171,7 @@ footer {
     flex-shrink: 0;
     transition: background var(--transition);
 }
-#twin-send:hover { background: #6ba3f9; }
+#twin-send:hover { background: var(--text); }
 #twin-send:disabled { opacity: 0.5; cursor: default; }
 
 /* ── Mobile: full-width panel ──────────────────────────────────────────── */
