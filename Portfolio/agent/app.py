@@ -51,6 +51,29 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/debug-env")
+def debug_env():
+    """Shows which env vars are set (values masked) — remove after debugging."""
+    def present(key):
+        val = os.getenv(key)
+        if not val:
+            return "❌ NOT SET"
+        return f"✅ set ({val[:6]}...)" if len(val) > 6 else "✅ set"
+
+    return {
+        "RESEND_API_KEY":      present("RESEND_API_KEY"),
+        "FROM_EMAIL":          os.getenv("FROM_EMAIL", "❌ NOT SET"),
+        "TO_EMAIL":            os.getenv("TO_EMAIL",   "❌ NOT SET"),
+        "SUPABASE_URL":        present("SUPABASE_URL"),
+        "SUPABASE_SECRET_KEY": present("SUPABASE_SECRET_KEY"),
+        "OPENAI_MODEL":        os.getenv("OPENAI_MODEL", "❌ NOT SET"),
+        "OPENAI_BASE_URL":     os.getenv("OPENAI_BASE_URL", "❌ NOT SET"),
+        "NTFY_TOPIC":          os.getenv("NTFY_TOPIC", "default"),
+        "CALENDLY_URL":        os.getenv("CALENDLY_URL", "❌ NOT SET"),
+        "AVAILABILITY":        os.getenv("AVAILABILITY", "default"),
+    }
+
+
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     messages = [system_msg] + req.history + [{"role": "user", "content": req.message}]
