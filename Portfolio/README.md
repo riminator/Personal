@@ -1,27 +1,109 @@
-# Portfolio — Akshay Mallireddy
+# Portfolio — Ramaakshay Mallireddy
 
-Personal portfolio and AI Digital Twin agent.
+Personal portfolio site + AI Digital Twin agent.
+
+**Live:**
+- Portfolio → Netlify (static)
+- Digital Twin API → Render (`https://portfolio-ylw8.onrender.com`)
+
+---
+
+## Structure
 
 ```
 Portfolio/
-├── static/          # Static HTML/CSS portfolio site
-│   ├── index.html
-│   ├── style.css
-│   ├── assets/      # Images, PDFs, 3D models, favicons
-│   ├── Dockerfile   # nginx:alpine image for static hosting
+├── static/                  # Portfolio website (Netlify)
+│   ├── index.html           # Main page — all sections + floating chat bubble
+│   ├── style.css            # Light/dark theme, all component styles
+│   ├── assets/              # Images, PDFs, 3D models, favicons
+│   ├── Dockerfile           # nginx:alpine (optional self-hosting)
 │   └── nginx.conf
-├── agent/           # Gradio + OpenAI Digital Twin chatbot
-│   ├── app.py
-│   ├── context.py   # Loads profile data (files or Supabase)
-│   ├── tools.py     # OpenAI function-calling tools
-│   ├── styles.py    # Gradio CSS/JS
-│   ├── linkedin.pdf
-│   ├── summary.txt
+├── agent/                   # Digital Twin API (Render)
+│   ├── app.py               # FastAPI — POST /chat, GET /health, GET /debug-env
+│   ├── context.py           # System prompt loader (local files or Supabase)
+│   ├── tools.py             # 6 OpenAI function-calling tools
+│   ├── linkedin.pdf         # LinkedIn export (context source)
+│   ├── summary.txt          # Personal summary (context source)
 │   ├── requirements.txt
 │   ├── Dockerfile
-│   ├── fly.toml     # Fly.io config
-│   └── railway.json # Railway config
-└── docker-compose.yml
+│   ├── .env.example         # All supported env vars with comments
+│   ├── fly.toml             # Fly.io config (alternative to Render)
+│   └── railway.json         # Railway config (alternative to Render)
+├── docker-compose.yml       # Run full stack locally
+├── netlify.toml             # Netlify build config
+└── README.md
+```
+
+---
+
+## Agent tools
+
+| Tool | Triggers when visitor… | Requires |
+|------|----------------------|----------|
+| `send_email` | provides their email | `RESEND_API_KEY`, `FROM_EMAIL`, `TO_EMAIL` |
+| `save_lead` | provides their email (fires with send_email) | `SUPABASE_URL`, `SUPABASE_SECRET_KEY` |
+| `get_availability` | asks if Akshay is open to work | nothing — has env/DB/hardcoded fallback |
+| `get_latest_projects` | asks what he's working on | nothing — uses public GitHub API |
+| `get_calendly_link` | wants to schedule a meeting | `CALENDLY_URL` |
+| `record_unknown_question` | asks something the agent can't answer | `NTFY_TOPIC` |
+
+---
+
+## Environment variables (Render)
+
+See [`agent/.env.example`](agent/.env.example) for the full annotated list.
+
+| Variable | Required | Notes |
+|----------|----------|-------|
+| `OPENAI_API_KEY` | ✅ | z.ai key |
+| `OPENAI_MODEL` | ✅ | e.g. `glm-4.7-flash` |
+| `OPENAI_BASE_URL` | ✅ | e.g. `https://api.z.ai/api/paas/v4/` |
+| `RESEND_API_KEY` | ✅ | From resend.com |
+| `FROM_EMAIL` | ✅ | `onboarding@resend.dev` until domain verified |
+| `TO_EMAIL` | ✅ | Where contact emails are delivered |
+| `SUPABASE_URL` | ✅ | Supabase project URL |
+| `SUPABASE_SECRET_KEY` | ✅ | Supabase service role key |
+| `NTFY_TOPIC` | optional | ntfy.sh push topic |
+| `CALENDLY_URL` | optional | Scheduling link |
+| `AVAILABILITY` | optional | Fallback if Supabase settings table not set |
+
+---
+
+## Supabase tables
+
+Run once in the Supabase SQL editor:
+
+```sql
+-- Stores visitor leads (name, email, notes)
+CREATE TABLE leads (
+    id         UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name       TEXT,
+    email      TEXT NOT NULL,
+    notes      TEXT,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Stores dynamic settings (availability status, etc.)
+CREATE TABLE settings (
+    key   TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+INSERT INTO settings (key, value)
+VALUES ('availability', 'open to internships and research roles for Summer/Fall 2026');
+
+-- Optional: replace linkedin.pdf + summary.txt with DB-managed context
+CREATE TABLE profile_context (
+    key   TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+INSERT INTO profile_context (key, value) VALUES
+    ('summary',  'Your summary text here...'),
+    ('linkedin', 'Your LinkedIn profile text here...');
+```
+
+To update your availability without redeploying:
+```sql
+UPDATE settings SET value = 'not currently available' WHERE key = 'availability';
 ```
 
 ---
@@ -29,120 +111,78 @@ Portfolio/
 ## Running locally
 
 ```bash
-cp agent/.env.example agent/.env   # add OPENAI_API_KEY etc.
+cp agent/.env.example agent/.env   # fill in secrets
 docker compose up --build
 
-# Static site → http://localhost:8080
-# Digital Twin → http://localhost:7860
+# Portfolio  → http://localhost:8080
+# Agent API  → http://localhost:10000
+```
+
+Or run the agent directly without Docker:
+```bash
+cd agent
+pip install -r requirements.txt
+cp .env.example .env   # fill in secrets
+python app.py
 ```
 
 ---
 
-## Deployment options
+## Deploying
 
-### Option 1 — Fly.io (Recommended)
+### Static site → Netlify (current)
 
-Best for: always-on agent + free tier, close to UT Austin (Dallas region).
+**Drag & drop:** upload `Portfolio/static/` at app.netlify.com → Deploy manually.
+
+**GitHub auto-deploy:**
+1. Connect `riminator/Personal` in Netlify dashboard
+2. Branch: `main` | Base directory: `Portfolio` | Publish directory: `static`
+3. Leave build command blank
+
+### Agent → Render (current)
+
+1. New Web Service → connect `riminator/Personal`
+2. Branch: `main` | Root directory: `Portfolio/agent` | Runtime: Docker
+3. Add all env vars from the table above
+4. Auto-deploys on every push to `main`
+
+**Debug endpoints** (remove when no longer needed):
+- `GET /debug-env` — shows which env vars are set (values masked)
+- `GET /test-email` — fires a real Resend test email and returns the API response
+
+### Alternative: Fly.io
 
 ```bash
-# Install CLI: https://fly.io/docs/hands-on/install-flyctl/
-brew install flyctl
-fly auth login
-
-# Deploy the agent
 cd agent
-fly launch          # first time — reads fly.toml, creates the app
-fly secrets set OPENAI_API_KEY=sk-...
-fly secrets set NTFY_TOPIC=Akshay_Notification_Portfolio_Agent
-fly deploy          # subsequent deploys
-
-# Deploy the static site (optional — see Option 2 for Cloudflare Pages)
-cd ../static
-fly launch --name akshay-portfolio
+fly launch      # reads fly.toml
+fly secrets set OPENAI_API_KEY=... RESEND_API_KEY=... # etc.
 fly deploy
 ```
 
-Agent URL will be: `https://akshay-digital-twin.fly.dev`  
-Update the two `https://your-agent-url.fly.dev` placeholders in `static/index.html`.
+### Alternative: Railway
+
+Connect repo → set root directory to `Portfolio/agent/` → add env vars → deploy.
+`railway.json` is already configured.
 
 ---
 
-### Option 2 — Railway
+## Updating the agent URL in the portfolio
 
-Best for: simpler UI, auto-deploy from GitHub push.
+The agent URL is set in one place in `static/index.html`:
 
-1. Push this repo to GitHub.
-2. Go to [railway.app](https://railway.app) → **New Project → Deploy from GitHub repo**.
-3. Select the repo, set **Root Directory** to `agent/`.
-4. Add environment variables: `OPENAI_API_KEY`, `NTFY_TOPIC`.
-5. Railway reads `railway.json` automatically — no config needed.
-6. Agent URL shows in the Railway dashboard.
-
-For the static site, deploy `static/` as a second Railway service (static serving) or use Cloudflare Pages.
-
----
-
-### Option 3 — Cloudflare Pages (Static Site) + Fly.io (Agent)
-
-The cleanest production split:
-
-| Part | Platform | Why |
-|------|----------|-----|
-| `static/` | Cloudflare Pages | CDN edge, free, auto-deploy from GitHub |
-| `agent/` | Fly.io | Docker, always-on, scales to 0 when idle |
-
-**Cloudflare Pages:**
-1. Connect GitHub repo in Cloudflare dashboard.
-2. Set Build output directory: `Portfolio/static`.
-3. No build command needed — it's plain HTML.
-
-**After deploying the agent**, replace the two `your-agent-url.fly.dev` placeholders in `static/index.html`:
-```html
-<!-- Both occurrences: -->
-href="https://akshay-digital-twin.fly.dev"
-src="https://akshay-digital-twin.fly.dev"
+```js
+const AGENT_URL = "https://portfolio-ylw8.onrender.com";
 ```
 
----
-
-### Option 4 — Render
-
-Similar to Railway with a generous free tier.
-
-1. New Web Service → connect GitHub.
-2. Root directory: `agent/`.
-3. Runtime: **Docker**.
-4. Set env vars in dashboard.
-5. Free tier spins down after 15 min of inactivity (cold start ~30s).
+Update this line if the Render service URL ever changes, then re-upload to Netlify.
 
 ---
 
-## Enabling Supabase context (future)
+## Upgrading Resend (custom domain)
 
-The agent is pre-wired in [`agent/context.py`](agent/context.py) to pull profile data from Supabase when credentials are present. To enable:
+Currently using `onboarding@resend.dev` as the sender. To use your own domain:
 
-1. Create a Supabase project at [supabase.com](https://supabase.com).
-2. Run this SQL in the Supabase SQL editor:
-   ```sql
-   CREATE TABLE profile_context (
-     key   TEXT PRIMARY KEY,
-     value TEXT NOT NULL
-   );
-
-   INSERT INTO profile_context (key, value) VALUES
-     ('summary',  'Your summary text here...'),
-     ('linkedin', 'Your LinkedIn profile text here...');
-   ```
-3. Add to `agent/.env` (or fly secrets / Railway env vars):
-   ```
-   SUPABASE_URL=https://xxxx.supabase.co
-   SUPABASE_KEY=your-anon-or-service-role-key
-   ```
-4. Uncomment `supabase>=2.0` in `agent/requirements.txt`.
-5. Redeploy. The agent will now pull from the DB — update content without redeploying.
-
----
-
-## Updating the iframe URL
-
-Once deployed, find both occurrences of `your-agent-url.fly.dev` in `static/index.html` and replace with your real agent URL.
+1. Go to [resend.com/domains](https://resend.com/domains) → Add Domain
+2. Add the DNS records Resend provides to your domain registrar
+3. Update `FROM_EMAIL` in Render to `twin@yourdomain.com`
+4. Update `TO_EMAIL` back to `akshaymall@utexas.edu` if desired
