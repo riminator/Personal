@@ -74,6 +74,30 @@ def debug_env():
     }
 
 
+@app.get("/test-email")
+def test_email():
+    """Trigger a test Resend email and return the full response — remove after debugging."""
+    import os, requests as req
+    key       = os.getenv("RESEND_API_KEY")
+    from_addr = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
+    to_addr   = os.getenv("TO_EMAIL",   "akshaymall@utexas.edu")
+    if not key:
+        return {"error": "RESEND_API_KEY not set"}
+    try:
+        resp = req.post(
+            "https://api.resend.com/emails",
+            json={"from": from_addr, "to": [to_addr],
+                  "subject": "Digital Twin — test email",
+                  "html": "<h2>Test</h2><p>If you see this, Resend is working!</p>"},
+            headers={"Authorization": f"Bearer {key}",
+                     "Content-Type": "application/json"},
+            timeout=10,
+        )
+        return {"status_code": resp.status_code, "body": resp.json()}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     messages = [system_msg] + req.history + [{"role": "user", "content": req.message}]
