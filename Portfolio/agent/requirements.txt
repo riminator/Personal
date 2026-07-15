@@ -4,5 +4,3 @@ openai>=1.0
 pypdf
 python-dotenv
 requests
-# Uncomment when Supabase integration is enabled:
-# supabase>=2.0
