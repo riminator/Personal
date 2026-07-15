@@ -5,20 +5,18 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-pushover_user = os.getenv("PUSHOVER_USER")
-pushover_token = os.getenv("PUSHOVER_TOKEN")
-
-pushover_url = "https://api.pushover.net/1/messages.json"
+ntfy_topic = os.getenv("NTFY_TOPIC", "Akshay_Notification_Portfolio_Agent")
+ntfy_url = f"https://ntfy.sh/{ntfy_topic}"
 
 
 def push(text):
     requests.post(
-        pushover_url,
-        data={
-            "token": pushover_token,
-            "user": pushover_user,
-            "message": text,
-        },
+        ntfy_url,
+        data=text.encode('utf-8'),
+        headers={
+            "Priority": "3",
+            "Title": "Portfolio Agent",
+        }
     )
 
 

@@ -53,7 +53,7 @@ fly auth login
 cd agent
 fly launch          # first time — reads fly.toml, creates the app
 fly secrets set OPENAI_API_KEY=sk-...
-fly secrets set PUSHOVER_USER=... PUSHOVER_TOKEN=...
+fly secrets set NTFY_TOPIC=Akshay_Notification_Portfolio_Agent
 fly deploy          # subsequent deploys
 
 # Deploy the static site (optional — see Option 2 for Cloudflare Pages)
@@ -74,7 +74,7 @@ Best for: simpler UI, auto-deploy from GitHub push.
 1. Push this repo to GitHub.
 2. Go to [railway.app](https://railway.app) → **New Project → Deploy from GitHub repo**.
 3. Select the repo, set **Root Directory** to `agent/`.
-4. Add environment variables: `OPENAI_API_KEY`, `PUSHOVER_USER`, `PUSHOVER_TOKEN`.
+4. Add environment variables: `OPENAI_API_KEY`, `NTFY_TOPIC`.
 5. Railway reads `railway.json` automatically — no config needed.
 6. Agent URL shows in the Railway dashboard.
 
