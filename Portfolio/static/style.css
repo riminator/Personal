@@ -350,7 +350,7 @@ section {
 }
 
 .home-content h3 span {
-    color: var(--indigo);
+    color: #BF5700;   /* UT Austin burnt orange */
     font-weight: 600;
 }
 
