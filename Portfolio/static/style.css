@@ -25,8 +25,8 @@
     --blue-dim:    rgba(44,62,80,0.08);
     --blue-glow:   rgba(44,62,80,0.15);
 
-    --gold:        #d4af37;
-    --gold-dim:    rgba(212,175,55,0.12);
+    --gold:        #BF5700;   /* UT Austin burnt orange */
+    --gold-dim:    rgba(191,87,0,0.12);
 
     --emerald:     #27ae60;
     --emerald-dim: rgba(39,174,96,0.12);
@@ -66,8 +66,8 @@ body.dark {
     --blue-dim:    rgba(123,156,219,0.12);
     --blue-glow:   rgba(123,156,219,0.25);
 
-    --gold:        #e8c84a;
-    --gold-dim:    rgba(232,200,74,0.12);
+    --gold:        #E8651A;   /* burnt orange, lighter for dark mode */
+    --gold-dim:    rgba(232,101,26,0.14);
 
     --emerald:     #3ecf74;
     --emerald-dim: rgba(62,207,116,0.12);
